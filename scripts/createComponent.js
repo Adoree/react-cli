@@ -1,4 +1,5 @@
 const { createDirectory, createFiles, createTemplate } = require("../utils/commands");
+const { createFile } = require('../constants');
 
 const args = process.argv.slice(2);
 const type = args[1];
@@ -19,6 +20,6 @@ if (type === "container") {
 
 createDirectory(type + 's', componentName);
 
-createFiles(extensions, subDir, componentName, type);
+createFiles(extensions, subDir, componentName, type, createFile);
 
 createTemplate(subDir, componentName, type);

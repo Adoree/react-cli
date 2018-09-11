@@ -1,29 +1,24 @@
 const fs = require('fs');
 const { exec } = require('child_process');
+const path = require('path');
 
 function createDirectory(dirName, componentName) {
-    if (!fs.existsSync(dirName)) {
-        exec(`mkdir ${dirName}`, (err) => {
-            if (err) {
-                throw err
-            }
-        })
+    if (!fs.existsSync(path.resolve(dirName))) {
+        fs.mkdirSync(path.resolve(dirName));
     }
-    if (!fs.existsSync(`${dirName}/${componentName}`)) {
-        exec(`mkdir ${dirName}/${componentName}`, (err) => {
-            if(err) { throw err }
-        })
+    if (!fs.existsSync(path.resolve(dirName, componentName))) {
+        fs.mkdirSync(path.resolve(dirName, componentName));
     }
 }
 
-function createFiles(extensions, subDir, component, type) {
+function createFiles(extensions, subDir, component, type, createFile) {
     extensions.forEach((ext) => {
-        exec('touch '+ subDir + component + ext, (err) => {
+        exec(createFile + path.resolve(subDir, component + ext), (err) => {
             if (err) { throw err }
         });
     });
     if (type === "component") {
-        exec('touch '+ subDir + "index.js", (err) => {
+        exec(createFile + path.resolve(subDir, "index.js"), (err) => {
             if (err) { throw err }
         });
     }
@@ -31,21 +26,21 @@ function createFiles(extensions, subDir, component, type) {
 
 function createTemplate(subDir, componentName, type) {
     if (type === "component") {
-        const templateJSX= `import React from 'react';
+        const template = `import React from 'react';
     
 function ${componentName}(props) {
     return (
         <div>${componentName} works!</div>
     )
 }`;
-        fs.writeFileSync(subDir + componentName + ".js", templateJSX);
+        fs.writeFileSync(path.resolve(subDir, componentName + ".js"), template);
 
         const templateIndex = `export default from './${componentName}.js'`;
-        fs.writeFileSync(subDir + "index.js", templateIndex);
+        fs.writeFileSync(path.resolve(subDir, "index.js"), templateIndex);
     }
 
     if (type === "container") {
-        const templateJSX = `import React, { Component } from 'react';
+        const template = `import React, { Component } from 'react';
     
 class ${componentName} extends Component {
     componentDidMount() {
@@ -59,7 +54,7 @@ class ${componentName} extends Component {
     }
 }`;
 
-        fs.writeFileSync(subDir + componentName + ".js", templateJSX);
+        fs.writeFileSync(path.resolve(subDir, componentName + ".js"), template);
     }
 }
 
